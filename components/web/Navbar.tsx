@@ -2,8 +2,17 @@
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "../ui/button";
 import Link from "next/link";
+import {
+  RegisterLink,
+  LoginLink,
+  LogoutLink,
+} from "@kinde-oss/kinde-auth-nextjs/components";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
-export function Navbar() {
+export async function Navbar() {
+  const { getUser, getRoles } = getKindeServerSession();
+  const user = await getUser();
+  const roles = await getRoles();
   return (
     <section className="py-8">
       <div className="container">
@@ -53,8 +62,25 @@ export function Navbar() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant={"outline"}>Log in</Button>
-            <Button>Sign up</Button>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <p>
+                  Welcome, {user.given_name} ({roles?.[0].name})
+                </p>
+                <LogoutLink>
+                  <Button variant={"outline"}>Log out</Button>
+                </LogoutLink>
+              </div>
+            ) : (
+              <>
+                <LoginLink>
+                  <Button variant={"outline"}>Log in</Button>
+                </LoginLink>
+                <RegisterLink>
+                  <Button>Sign up</Button>
+                </RegisterLink>
+              </>
+            )}
           </div>
         </nav>
         <div className="block lg:hidden">

@@ -12,12 +12,20 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CreatePost } from "../actions";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { redirect } from "next/navigation";
 
 const DashboardPage = async () => {
+  const { isAuthenticated, getPermission } = getKindeServerSession();
+  const permission = await getPermission("create:post");
+
+  if (!(await isAuthenticated()) || permission?.isGranted !== true) {
+    return redirect("/");
+  }
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dashboard - only for admins and editors</CardTitle>
+        <CardTitle>Dashboard - only for admins </CardTitle>
         <CardDescription>
           This page should only be accesible for people/users who are
           authenticated and at the same time either have a admin or editor role
